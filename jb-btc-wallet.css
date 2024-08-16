@@ -1,0 +1,51 @@
+.box {
+  border: 2px solid #009900;
+  padding: 0 30px 20px;
+  font-family: monospace;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  margin-bottom: 25px;
+}
+.box h3 {
+  background-color: #009900;
+  margin: 0 -30px 20px;
+  padding: 10px 15px;
+}
+
+.box#functions-box {  
+  border: 2px solid #007cff;
+}
+.box#functions-box h3 {  
+  background-color: #007cff;
+  color: white;
+}
+
+.key-input {
+  width: 630px; 
+  font-family: monospace; 
+  margin: 5px 0 0 10px; 
+}
+
+.key-label {
+  min-width: 130px;
+  display: inline-block;
+  font-weight: bold;
+}
+
+.box button {
+  font-family: monospace; 
+  padding: 1px 5px;
+}
+
+.key-value {
+  /* width: 600px; */
+  font-family: monospace;
+  margin: 10px 10px 0;
+  display: inline-block;
+}
+
+.key-value-word {
+  font-family: monospace;
+  margin: 2px 20px 0;
+  display: inline-block;
+}

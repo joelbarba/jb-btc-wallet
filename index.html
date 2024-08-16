@@ -1,0 +1,167 @@
+<!doctype html>
+<html>
+<head>
+	<title>JB-BTC-WALLET</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="jb-btc-wallet.css"></link>
+</head>
+<body>
+	<h1>JB-BTC-WALLET</h1>
+
+  <div class="box" id="single-wallet">
+    <h3>BTC Single Sig Wallet</h3>
+    <button id="clear-all-btn" style="margin-bottom: 15px;">Clear</button>
+    <button id="generate-private-key-btn" style="margin-bottom: 15px;">Generate New Random Private Key</button>
+
+    <br/>
+    <span class="key-label">Private Key (HEX - 32 bytes) ------------> </span>
+    <input id="private-key-hex-input" class="key-input"/>
+    <button id="pk-hex-load-from">Load from</button>
+
+    <br/>
+    <span class="key-label">Private Key (WIF - 51 chars uncomp) -----> </span>
+    <input id="private-key-wif-input" class="key-input"/>
+    <button id="pk-wif-load-from">Load from</button>
+
+    <br/>
+    <span class="key-label">Private Key (WIF - 52 chars compress) ---> </span>
+    <input id="private-key-wif-comp-input" class="key-input"/>
+    <button id="pk-wif-comp-load-from">Load from</button>
+
+    <br/>
+    <span class="key-label">Private Key (DEC) -----------------------> </span>
+    <span id="private-key-dec" class="key-value"></span>
+
+    <br/>
+    <span class="key-label">Private Key (BIN - 256 bits) ------------> </span>
+    <span id="private-key-bin" class="key-value"></span>
+
+    <hr/>
+    
+    <span class="key-label">Public Key Compressed (HEX - 33 bytes) ----------> </span>
+    <span id="public-key" class="key-value"></span>
+
+    <br/>
+    <span class="key-label">Public Key Uncompressed (HEX - 64 bytes) --------> </span>
+    <span id="public-key-uncompressed" class="key-value"></span>
+
+    <br/>
+    <span class="key-label">Public Key ECDSA Coordinates (HEX - 32 bytes) ---> </span>
+    <span id="public-key-coordinates" class="key-value"></span>
+    <br/>
+
+
+    <hr/>
+    <span class="key-label">BTC P2PKH Address (34 chars) -----> </span>
+    <span id="btc-address-p2pkh" class="key-value"></span>
+    <br/>
+    <span class="key-label">BTC P2WPKH Address (42 chars) ----> </span>
+    <span id="btc-address-p2wpkh" class="key-value"></span>
+  </div>
+
+
+  <div class="box" id="hd-wallet">
+    <h3>BTC HD Wallet</h3>
+    <button id="clear-hd-wallet-btn" style="margin-bottom: 15px;">Clear</button>
+    <button id="generate-hd-wallet-btn" style="margin-bottom: 15px;">Generate New Random Seed Phrase</button>
+    <span class="key-label" style="margin-left: 20px;">Seed Phrase Size: </span>
+    <select id="hd-wallet-phrase-size">
+      <option value="12">12 words - 128 bits (16 bytes)</option>
+      <option value="15">15 words - 160 bits (20 bytes)</option>
+      <option value="18">18 words - 192 bits (24 bytes)</option>
+      <option value="21">21 words - 224 bits (28 bytes)</option>
+      <option value="24">24 words - 256 bits (32 bytes)</option>
+    </select>
+
+
+    <br/>
+    <span class="key-label" id="hdw-sp-label">Seed Phrase (HEX - 16 bytes) ----> </span>
+    <input id="seed-phrase-hex-input" class="key-input"/>
+    <button id="hdw-btn-load-from-sphex">Load from</button>
+    <br/>
+    <span class="key-label">Seed Phrase Mnemonic ------------> </span>
+    <textarea id="seed-phrase-words-input" class="key-input" style="vertical-align: middle;"></textarea>
+    <button id="hdw-btn-load-from-phrase">Load from</button>
+    <br/>
+    <span class="key-label">Seed Phrase Mnemonic Ascii HEX --> </span>
+    <span id="seed-phrase-ascii-hex-val" class="key-value">ffffffffff</span>
+    
+    <br/><br/>
+    <div>
+      <span id="hdw-sp-word1"  class="key-value-word">01. piano = 2047 = 0101000101 </span>
+      <span id="hdw-sp-word2"  class="key-value-word">02. piano = 2047 = 0101000101 </span>
+      <span id="hdw-sp-word3"  class="key-value-word">03. piano = 2047 = 0101000101 </span><br/>
+      <span id="hdw-sp-word4"  class="key-value-word">04. piano = 2047 = 0101000101 </span>
+      <span id="hdw-sp-word5"  class="key-value-word">05. piano = 2047 = 0101000101 </span>
+      <span id="hdw-sp-word6"  class="key-value-word">06. piano = 2047 = 0101000101 </span><br/>
+      <span id="hdw-sp-word7"  class="key-value-word">07. piano = 2047 = 0101000101 </span>
+      <span id="hdw-sp-word8"  class="key-value-word">08. piano = 2047 = 0101000101 </span>
+      <span id="hdw-sp-word9"  class="key-value-word">09. piano = 2047 = 0101000101 </span><br/>
+      <span id="hdw-sp-word10" class="key-value-word">10. piano = 2047 = 0101000101 </span>
+      <span id="hdw-sp-word11" class="key-value-word">11. piano = 2047 = 0101000101 </span>
+      <span id="hdw-sp-word12" class="key-value-word">12. piano = 2047 = 0101000101 </span><br/>
+      <span id="hdw-sp-word13" class="key-value-word">13. piano = 2047 = 0101000101 </span>
+      <span id="hdw-sp-word14" class="key-value-word">14. piano = 2047 = 0101000101 </span>
+      <span id="hdw-sp-word15" class="key-value-word">15. piano = 2047 = 0101000101 </span><br/>
+      <span id="hdw-sp-word16" class="key-value-word">16. piano = 2047 = 0101000101 </span>
+      <span id="hdw-sp-word17" class="key-value-word">17. piano = 2047 = 0101000101 </span>
+      <span id="hdw-sp-word18" class="key-value-word">18. piano = 2047 = 0101000101 </span><br/>
+      <span id="hdw-sp-word19" class="key-value-word">19. piano = 2047 = 0101000101 </span>
+      <span id="hdw-sp-word20" class="key-value-word">20. piano = 2047 = 0101000101 </span>
+      <span id="hdw-sp-word21" class="key-value-word">21. piano = 2047 = 0101000101 </span><br/>
+      <span id="hdw-sp-word22" class="key-value-word">22. piano = 2047 = 0101000101 </span>
+      <span id="hdw-sp-word23" class="key-value-word">23. piano = 2047 = 0101000101 </span>
+      <span id="hdw-sp-word24" class="key-value-word">24. piano = 2047 = 0101000101 </span><br/>
+    </div>
+
+    <br/>
+    <span class="key-label">Seed Passphrase ------> mnemonic +</span>
+    <input id="seed-phrase-passphrase" class="key-input"/>
+    <button id="hdw-btn-recalc-seed">Recalculate Master Seed</button>
+
+    <br/>
+    <span class="key-label">Master Seed (64 bytes HEX) --> </span>
+    <span id="hdw-master-seed" class="key-value">ffffffffff</span>
+    <hr/>
+    <span class="key-label">Master Key:</span>
+    <div style="margin-left: 15px;">
+      <span class="key-label">- Private Key (32 bytes HEX) --> </span>
+      <span id="hdw-master-private-key" class="key-value">ffffffffff</span>  
+      <br/>
+      <span class="key-label">- Public Key (32 bytes HEX) ---> </span>
+      <span id="hdw-master-public-key" class="key-value">ffffffffff</span>  
+      <br/>
+      <span class="key-label">- Chain Code (32 bytes HEX) ---> </span>
+      <span id="hdw-master-chain-code" class="key-value">ffffffffff</span>
+      <br/>
+      <span class="key-label">- xPrv (78 byte) --------------> </span>
+      <span id="hdw-master-xprv" class="key-value">ffffffffff</span>
+      <br/>
+      <span class="key-label">- xPub (78 byte) --------------> </span>
+      <span id="hdw-master-xpub" class="key-value">ffffffffff</span>
+    </div>
+
+    <br>
+    <hr/>
+    <span class="key-label">Derived Child Key (from master):</span>
+    <span>Index:</span><input id="hdw-derived-key-index" style="width: 60px;"/>
+    <span>Hardened:</span><input type="checkbox" id="hdw-derived-key-hardened">
+    <span>(index + 2147483648)</span>
+    <button id="hdw-derived-key-calc">Calculate Derived Key</button>
+    <div style="margin-left: 15px;">      
+    </div>
+
+    <br>
+    <hr/>
+    <button id="hdw-derived-key-calc">Calculate Key from Derivation Path</button>
+    <span>Derivation Path:</span><input id="hdw-derived-key-derivation-path" style="width: 120px;"/>
+    <div style="margin-left: 15px;">      
+    </div>
+
+  </div>
+
+
+
+
+</body>
+</html>
