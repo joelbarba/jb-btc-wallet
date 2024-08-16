@@ -1,11 +1,12 @@
 const getEl = (q) => document.getElementById(q); // shortcut
+const format = encoders.format; // shortcut
 
-const format = encoders.format;
 
+
+// -------------------------------------- Single Sig Wallet --------------------------------------
 
 let wallet = btcWallet.create('adf10f0b705a08a981615925eb2ce563b274547bd8c991468706e91d07feb388');
 console.log(wallet);
-
 
 displayWallet();
 
@@ -56,3 +57,6 @@ function loadFromWif(wif) {
   console.log(pkHex);
   wallet = btcWallet.create(pkHex); displayWallet();
 }
+
+
+// -------------------------------------- HD Wallet --------------------------------------

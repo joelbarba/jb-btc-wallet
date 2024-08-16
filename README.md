@@ -17,6 +17,8 @@ The project is structured in the following JS modules (IEEF):
 - Sig-Wallet
 - HD-Wallet
 
+
+
 ### Encoders
 
 `jb-encoders.js`
@@ -41,6 +43,8 @@ Example:
 ```javascript
 encoders.format('F1E', 'hex', 'dec');
 ```
+
+
 
 ### Hashes
 
@@ -70,6 +74,8 @@ Example:
 hashes.sha256('AA37F');
 ```
 
+
+
 ### ECDSA
 
 `jb-ecdsa.js`
@@ -97,6 +103,36 @@ const point = ecdsa.mult(ecdsa.secp256k1.G, BigInt('0x' + pk));
 console.log(point); // Coordinates of G * point
 ```
 
+
+
+### BIP 39 Seed
+
+`jb-bip39-seed.js`
+
+This module is dependent on `jb-encoders.js` and `jb-hashes.js`..
+
+It contains the methods to handle the english word list to represent [BIP 39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) Mnemonic Seed Phrase.
+
+The methods allow to generate a new random seed, or convert an existing seed from a mnemonic sentence (word list) to a seed value (64 bytes hexadecimal value), computed through a `PBKDF2` with an optional passphrase.
+
+```
+- wordList[]          --> Array with the 2048 english words
+- generateSeedPhrase  --> (numOfWords) => words[]     To generate a new random seed phrase (returns an array with words)
+- hexToPhrase         --> (hexStr) => words[]         Returns the mnemonic seed phrase (words) from its hex value
+- phraseToHex         --> (words[]) => hexStr         Converts the mnemonic seed phrase array of words to its hex value
+- phraseToSeed        --> (words[], pass) => seedHex  Generates the "seed" (hex) from the "seed phrase" (array of words)
+```
+
+Example:
+```javascript
+const words = ['ripple', 'hat', 'helmet', 'develop', 'betray', 'panda', 
+               'radio', 'zebra', 'payment', 'silver', 'physical', 'barely'];
+const hex = bip39seed.phraseToHex(words);
+const seed = bip39seed.phraseToSeed(words, 'myPassphrase');
+```
+
+
+
 ### Sig Wallet
 
 `jb-sig-wallet.js`
@@ -122,5 +158,6 @@ The values on the object are:
 
 Example:
 ```javascript
-const wallet = btcWallet.create('adf10f0b705a08a981615925eb2ce563b274547bd8c991468706e91d07feb388');
+const pk = 'adf10f0b705a08a981615925eb2ce563b274547bd8c991468706e91d07feb388';
+const wallet = btcWallet.create(pk);
 ```
