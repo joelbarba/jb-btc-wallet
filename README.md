@@ -39,7 +39,7 @@ The module exports the `format(value, formatIn, formatOut)` function, which take
 
 Example: 
 ```javascript
-  encoders.format('F1E', 'hex', 'dec');
+encoders.format('F1E', 'hex', 'dec');
 ```
 
 ### Hashes
@@ -67,7 +67,7 @@ There is a function for each of the following operations:
 
 Example:
 ```javascript
-  hashes.sha256('AA37F');
+hashes.sha256('AA37F');
 ```
 
 ### ECDSA
@@ -76,7 +76,7 @@ Example:
 
 This module is dependent on `jb-encoders.js` and `jb-hashes.js`.
 
-This module contains the main constants and methods to use ECDSA (Elliptic Curve Digital Signature Algorithm) with `secp256k1`.
+This module contains the main constants and methods to use ECDSA (Elliptic Curve Digital Signature Algorithm).
 
 It exports an object to access the constant values of the Bitcoin Elliptic Curve: `ecdsa.secp256k1`. And the main functions to perform operations on the curve:
 
@@ -87,12 +87,12 @@ It exports an object to access the constant values of the Bitcoin Elliptic Curve
   - add       --> ([x1, y1], [x2, y2]) => [x, y]   Adds 2 points
   - mult      --> ([x, y], mul) => [x, y]          Multiplies a point by a value
   - modPow    --> (value, exp, mod) => value       Modular power operation
-  - modSqrt   --> (value) => value                 Modular Square Root operation (Tonelli-Shanks algorithm)
+  - modSqrt   --> (value) => value                 Modular Square Root operation
 ```
 
 Example:
 ```javascript
-  const pk = 'adf10f0b705a08a981615925eb2ce563b274547bd8c991468706e91d07feb388';
-  const point = ecdsa.mult(ecdsa.secp256k1.G, BigInt('0x' + pk)); // Multiply by the generator ECDSA point
-  console.log(point);
+const pk = 'adf10f0b705a08a981615925eb2ce563b274547bd8c991468706e91d07feb388';
+const point = ecdsa.mult(ecdsa.secp256k1.G, BigInt('0x' + pk));
+console.log(point); // Coordinates of G * point
 ```
