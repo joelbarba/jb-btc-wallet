@@ -60,3 +60,102 @@ function loadFromWif(wif) {
 
 
 // -------------------------------------- HD Wallet --------------------------------------
+
+
+
+let hdWallet = btcHDWallet.loadSeedPhrase(['ripple', 'hat', 'helmet', 'develop', 'betray', 'panda', 'radio', 'zebra', 'payment', 'silver', 'physical', 'barely']);
+console.log('HD Wallet', hdWallet);
+
+displayHDWallet();
+
+
+document.getElementById('generate-hd-wallet-btn').addEventListener('click', function newHDWallet() {
+  const numWords = Number.parseInt(getEl('hd-wallet-phrase-size').value, 10) || 12;
+  hdWallet = btcHDWallet.create(numWords);
+  displayHDWallet();
+});
+
+document.getElementById('hdw-btn-load-from-sphex').addEventListener('click', function() {
+  const words = bip39.hexToPhrase(getEl('seed-phrase-hex-input').value);
+  hdWallet = btcHDWallet.loadSeedPhrase(words);
+  displayHDWallet();
+});
+
+document.getElementById('hdw-btn-load-from-phrase').addEventListener('click', function() {
+  const words = getEl('seed-phrase-words-input').value.split(' ');
+  hdWallet = btcHDWallet.loadSeedPhrase(words);
+  displayHDWallet();
+});
+
+document.getElementById('hdw-btn-recalc-seed').addEventListener('click', function() {
+  const words = getEl('seed-phrase-words-input').value.split(' ');
+  const passphrase = getEl('seed-phrase-passphrase').value;
+  hdWallet = btcHDWallet.loadSeedPhrase(words, passphrase);
+  displayHDWallet();
+});
+
+document.getElementById('clear-hd-wallet-btn').addEventListener('click', function() {
+  getEl('hd-wallet-phrase-size').value = '';
+  getEl('seed-phrase-hex-input').value = '';
+  getEl('seed-phrase-words-input').value = '';
+  getEl('hdw-sp-label').innerHTML = `Seed Phrase (HEX) ---------------> `;
+  getEl('seed-phrase-ascii-hex-val').innerHTML = '';
+  getEl('hdw-master-seed').innerHTML = '';
+  for (let t = 0; t < 24; t++) { getEl(`hdw-sp-word${t + 1}`).innerHTML = ''; }
+  getEl('hdw-master-private-key').innerHTML = '';
+  getEl('hdw-master-public-key').innerHTML = '';
+  getEl('hdw-master-chain-code').innerHTML = '';
+  getEl('hdw-master-xprv').innerHTML = '';
+  getEl('hdw-master-xpub').innerHTML = '';
+});
+
+
+function displayHDWallet() {
+  const words = hdWallet.seedPhraseMnemonic;
+  getEl('hd-wallet-phrase-size').value = hdWallet.seedPhraseMnemonic.length + '';
+  getEl('seed-phrase-hex-input').value = hdWallet.seedPhraseHex;
+  getEl('seed-phrase-words-input').value = words.join(' ');
+  getEl('hdw-sp-label').innerHTML = `Seed Phrase (HEX - ${hdWallet.seedPhraseHex.length / 2} bytes) ----> `;
+  getEl('seed-phrase-ascii-hex-val').innerHTML = format(words.join(' '), 'str', 'hex');
+  getEl('hdw-master-seed').innerHTML = hdWallet.masterSeedHex;
+  
+  // display seed phrase words
+  const lenW = Math.max(...words.map(v => v.length));
+  const colW = words.length / 3;
+  for (let t = 0; t < 24; t++) {     
+    const el = getEl(`hdw-sp-word${t + 1}`);
+    if (el) {
+      if (t >= hdWallet.seedPhraseMnemonic.length) {
+        el.innerHTML = '';
+      } else {
+        const ind = ((t * colW) % words.length) + Math.ceil((t + 1) / 3) - 1;
+        const word = hdWallet.seedPhraseMnemonic[ind];
+        const dec = bip39seed.wordList.indexOf(word);
+        el.innerHTML = `${ind + 1}`.padStart(2, '0') + '. ';
+        el.innerHTML += (word + ' ').padEnd(lenW + 2, '-') + '> ';
+        el.innerHTML += (dec + '').padStart(4, '0') + ' = ';
+        el.innerHTML += `${format(dec, 'dec', 'bin').padStart(11, '0')} `;
+      }
+    }
+  }
+
+  getEl('hdw-master-private-key').innerHTML = hdWallet.masterKey.privateKey;
+  getEl('hdw-master-public-key').innerHTML = hdWallet.masterKey.publicKey;
+  getEl('hdw-master-chain-code').innerHTML = hdWallet.masterKey.chainCode;
+  getEl('hdw-master-xprv').innerHTML = hdWallet.masterKey.xPrv;
+  getEl('hdw-master-xpub').innerHTML = hdWallet.masterKey.xPub;
+}
+
+
+document.getElementById('hdw-derived-key-calc').addEventListener('click', function() {
+  const index = Number.parseInt(getEl('hdw-derived-key-index').value, 10);
+  const hardened = !!getEl('hdw-derived-key-hardened').checked;
+
+  const child = hdWallet.masterKey.deriveKeyFn(index, hardened);
+  getEl('hdw-child-index').innerHTML       = child.index + '';
+  getEl('hdw-child-private-key').innerHTML = child.privateKey;
+  getEl('hdw-child-public-key').innerHTML  = child.publicKey;
+  getEl('hdw-child-chain-code').innerHTML  = child.chainCode;
+  getEl('hdw-child-xprv').innerHTML        = child.xPrv;
+  getEl('hdw-child-xpub').innerHTML        = child.xPub;
+});

@@ -61,7 +61,7 @@
 
 
   <div class="box" id="hd-wallet">
-    <h3>BTC HD Wallet</h3>
+    <h3>BTC Hierarchical Deterministic Wallet</h3>
     <button id="clear-hd-wallet-btn" style="margin-bottom: 15px;">Clear</button>
     <button id="generate-hd-wallet-btn" style="margin-bottom: 15px;">Generate New Random Seed Phrase</button>
     <span class="key-label" style="margin-left: 20px;">Seed Phrase Size: </span>
@@ -144,11 +144,28 @@
     <br>
     <hr/>
     <span class="key-label">Derived Child Key (from master):</span>
-    <span>Index:</span><input id="hdw-derived-key-index" style="width: 60px;"/>
+    <span>Index:</span><input id="hdw-derived-key-index" value="5" style="width: 60px;"/>
     <span>Hardened:</span><input type="checkbox" id="hdw-derived-key-hardened">
     <span>(index + 2147483648)</span>
     <button id="hdw-derived-key-calc">Calculate Derived Key</button>
-    <div style="margin-left: 15px;">      
+    <div style="margin-left: 15px;">
+      <span class="key-label">- Child Index -----------------> </span>
+      <span id="hdw-child-index" class="key-value"></span>
+      <br/>
+      <span class="key-label">- Private Key (32 bytes HEX) --> </span>
+      <span id="hdw-child-private-key" class="key-value"></span>
+      <br/>
+      <span class="key-label">- Public Key (32 bytes HEX) ---> </span>
+      <span id="hdw-child-public-key" class="key-value"></span>  
+      <br/>
+      <span class="key-label">- Chain Code (32 bytes HEX) ---> </span>
+      <span id="hdw-child-chain-code" class="key-value"></span>
+      <br/>
+      <span class="key-label">- xPrv (78 byte) --------------> </span>
+      <span id="hdw-child-xprv" class="key-value"></span>
+      <br/>
+      <span class="key-label">- xPub (78 byte) --------------> </span>
+      <span id="hdw-child-xpub" class="key-value"></span>
     </div>
 
     <br>
@@ -164,7 +181,9 @@
   <script type="text/javascript" src="jb-encoders.js"></script>
   <script type="text/javascript" src="jb-hashes.js"></script>
   <script type="text/javascript" src="jb-ecdsa.js"></script>
+  <script type="text/javascript" src="jb-bip39-seed.js"></script>
   <script type="text/javascript" src="jb-sig-wallet.js"></script>
+  <script type="text/javascript" src="jb-hd-wallet.js"></script>
 
   <script type="text/javascript" src="main.js"></script>
 
