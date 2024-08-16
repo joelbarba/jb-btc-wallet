@@ -96,3 +96,31 @@ const pk = 'adf10f0b705a08a981615925eb2ce563b274547bd8c991468706e91d07feb388';
 const point = ecdsa.mult(ecdsa.secp256k1.G, BigInt('0x' + pk));
 console.log(point); // Coordinates of G * point
 ```
+
+### Sig Wallet
+
+`jb-sig-wallet.js`
+
+This module is dependent on `jb-encoders.js`, `jb-hashes.js` and `jb-ecdsa.js`.
+
+It contains a `create()` function that generates an object with a Single Sig BTC Wallet.
+
+You can optionally pass in a private key (in hex string format) so it initializes the wallet from that key.
+The values on the object are:
+
+```
+- privateKey          : 32 bytes (HEX) - Private key
+- publicKey           : 33 bytes (HEX) - Compressed Public key
+- uncompressedPubKey  : 65 bytes (HEX) - Unompressed Public key
+- pubKeyXCoordinate   : 32 bytes (HEX) - X Coordinate of the ECDSA public key point
+- pubKeyYCoordinate   : 32 bytes (HEX) - Y Coordinate of the ECDSA public key point
+- p2pkhBTCAddress     : 34 chars (Base58) - BTC Address (for P2PKH locking script)
+- p2wpkhBTCAddress    : 42 chars (Bech32) - BTC Address (for P2WPKH locking script)  bc1...
+- wif                 : 51 chars (Base58) - Private key WIF format, with uncompress public key indicator
+- wifCompressed       : 52 chars (Base58) - Private key WIF format, with compress public key indicator
+```
+
+Example:
+```javascript
+const wallet = btcWallet.create('adf10f0b705a08a981615925eb2ce563b274547bd8c991468706e91d07feb388');
+```
