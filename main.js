@@ -2,4 +2,4 @@ const getEl = (q) => document.getElementById(q); // shortcut
 
 const format = encoders.format;
 
-console.log('F1E = ', format('F1E', 'hex', 'dec'));
+console.log('sha256 = ', hashes.sha256('AA37F'));

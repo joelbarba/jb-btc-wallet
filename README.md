@@ -17,6 +17,8 @@ The project is structured in the following JS modules (IEEF):
 
 ### Encoders
 
+`jb-encoders.js`
+
 By default all values are in hexadecimal format as a string (not the 0x value, but the hex value in a js string).
 This is obviously not efficient in terms of computing, but it's easy to manipulate and debug, which is the goal of this software.
 
@@ -29,6 +31,26 @@ Here's the different formats a value can be transformed from/to:
   - b58 = base58
   - str = plain text string
 
-The module exports the `format` function, which takes 3 parameters: the value to convert from, the format from and the format to.
-Example: format('F1E', 'hex', 'dec')
+The module exports the `format(value, formatIn, formatOut)` function, which takes 3 parameters: the value to convert from, the format from and the format to.
+Example: encoders.format('F1E', 'hex', 'dec')
 
+### Hashes
+
+`jb-hashes.js`
+
+This module is dependent on `jb-encoders.js`.
+It contains all the hashing operations + base58Check and Bech32 needed to run the bitcoin wallet generation.
+All input/output parameters are in hexadecimal strings, except base58Check and Bech32 returned values.
+There is a function for each of the following operations:
+
+  - sha256       --> (hex) => hex
+  - sha512       --> (hex) => hex
+  - ripemd160    --> (hex) => hex
+  - hash256      --> (hex) => hex
+  - hash160      --> (hex) => hex
+  - base58Check  --> (hex) => b58
+  - bech32       --> (hex) => bech32
+  - hmac512      --> (key hex, msg hex) => hex
+  - pbkdf2       --> (password hex, salt hex, iterations, dkLen) => hex
+
+Example: hashes.sha256('AA37F');
