@@ -1,10 +1,13 @@
 # JB-BTC-WALLET
 
-This is a Vanilla Bitcoin Wallet generator, that makes all calculations with 0 dependencies from another libraries.
+This is a Vanilla Bitcoin Wallet generator. It makes all calculations with 0 dependencies from any external library.
 
-This is not meant for production usage! This is only for learning purposes.
+This is obviously not meant for production usage! but for learning purposes only.
 
 The fact that no external libraries or native APIs have been used is to have a full understanding of all the operations involved in the Bitcoin Wallet software.
+
+You can find a running instance here: [https://jb-btc-wallet.netlify.app/](https://jb-btc-wallet.netlify.app/)
+Even though values are exactly the same as if you'd use a comercial wallet, do not use any of these wallets with real bitcoins. Always protect your data.
 
 ## JS Modules
 
