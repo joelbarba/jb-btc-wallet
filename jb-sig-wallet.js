@@ -79,8 +79,8 @@ const btcWallet = (function() {
     
     const xHex = encoders.format(x, 'dec', 'hex'); // f04bb78709714ba33f339e8ec85ae9be93aaf25bb9bfe9b709f5d8bd3f6981af
     const yHex = encoders.format(y, 'dec', 'hex'); // 837d50e6fb41a7c59e8f98649e0bb15618552451189b31edb7cb504247d8e1af
-    const uncompressedPubKey = '04' + xHex.padStart(32, '0') + yHex.padStart(32, '0');
-    const compressedPubKey = (y % 2n ? '03' : '02') + xHex.padStart(32, '0');
+    const uncompressedPubKey = '04' + xHex.padStart(64, '0') + yHex.padStart(64, '0');
+    const compressedPubKey = (y % 2n ? '03' : '02') + xHex.padStart(64, '0');
     
     // console.log(`Uncompresed Public Key (65 bytes - hex) = ${uncompressedPubKey}`);
     // console.log(`Compresed Public Key (63 bytes - hex) = ${compressedPubKey}`);

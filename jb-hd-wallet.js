@@ -47,12 +47,12 @@ const btcHDWallet = (function() {
 
     // Wrapping this calculation into a function so we can make it recursive
     // to generate the HD key tree through the deriveKeyFn() function
-    function calcAllKeys(privateKey, chainCode, index = 0) {
+    function calcAllKeys(privateKey, chainCode, index = 0, depth = 0, parentPubKey = '') {
       const wallet = btcWallet.create(privateKey);
       const xPrvHex = privateKey + chainCode;        //   9964f8fca205bf821e70a8ce911c7d057f3df1323cd6106a0bef57cb4b72c9fa 5a2d53f8ec7397cf4c8a51fd28c7fd96311982e5d693ae0c8ab2764a4c7d7fef
       const xPubHex = wallet.publicKey + chainCode;  // 02da94de331f507e93a2dfea5b91a0c75a3b39893501a171f2eb55b44b0515b50f 5a2d53f8ec7397cf4c8a51fd28c7fd96311982e5d693ae0c8ab2764a4c7d7fef
-      const xPrv = xKeyEncode('xprv', 0, 0, privateKey, chainCode);
-      const xPub = xKeyEncode('xpub', 0, 0, wallet.publicKey, chainCode);
+      const xPrv = xKeyEncode('xprv', depth, index, privateKey,       chainCode, parentPubKey);
+      const xPub = xKeyEncode('xpub', depth, index, wallet.publicKey, chainCode, parentPubKey);
       const children = []; // Private derived keys (by calculation order)
 
       const deriveKeyFn = (index = 0, hardened = true) => {
@@ -60,7 +60,7 @@ const btcHDWallet = (function() {
         let child = children.find(k => k.index === index);
         if (!child) {
           const { privateKey, chainCode } = derivePrivateKey(xPrvHex, index, hardened);
-          child = calcAllKeys(privateKey, chainCode, index);
+          child = calcAllKeys(privateKey, chainCode, index, depth + 1, wallet.publicKey);
           children.push(child);
         }
         return child;
@@ -81,7 +81,7 @@ const btcHDWallet = (function() {
   /****************************************************************************
    * Converts a xKey into its base58 address format
    * Parameters:
-   * - keyType      xprv / xpub
+   * - keyType      xprv / xpub / yprv / ypub / zprv / zpub
    * - depthLevel   0 to 255 (how many childs from master key). 0 = master key
    * - index        from 0 to 2147483647 (normal)
    *                from 2147483648 to 4294967295 (hardened)
@@ -93,7 +93,16 @@ const btcHDWallet = (function() {
   function xKeyEncode(keyType = 'xprv', depthLevel = 0, index = 0, key, chainCode = '', parentPubKey = '') {
     if (depthLevel === 0 && index > 0) { console.error('For master key (depth = 0) index should be alwas 0'); }
 
-    const version = keyType === 'xprv' ? '0488ADE4' : '0488B21E'; // xprv=0488ADE4, xpub=0488ADE4 in base58
+    switch (keyType) {
+      case 'xprv': version = '0488ade4'; break;
+      case 'xpub': version = '0488b21e'; break;
+      case 'yprv': version = '049d7878'; break;
+      case 'ypub': version = '049d7cb2'; break;
+      case 'zprv': version = '04b2430c'; break;
+      case 'zpub': version = '04b24746'; break;
+      default: throw new Error('Wrong key type: ', keyType);
+    }
+
     const keyPrefix = keyType === 'xprv' ? '00' : '';
     const depth = format(depthLevel, 'dec', 'hex').padStart(2, '0');
     const indexHex = format(index, 'dec', 'hex').padStart(8, '0');
@@ -136,12 +145,13 @@ const btcHDWallet = (function() {
   function derivePrivateKey(xPrivateKey, index = 0, hardened = true) {
     // const orderOfTheCurve = 115792089237316195423570985008687907852837564279074904382605163141518161494337n; // https://en.bitcoin.it/wiki/Secp256k1
     const orderOfTheCurve = ecdsa.secp256k1.n;
+    // const orderOfTheCurve = ecdsa.secp256k1.p;
     const privateKey = xPrivateKey.slice(0, 64);
     const chainCode = xPrivateKey.slice(64, 128);
 
     let data = '';
     if (hardened && index < 2147483648) { index = index + 2147483648; }
-    if (index >= 2147483648) { data = privateKey; }         // Hardened child -> Use private key
+    if (index >= 2147483648) { data = '00' + privateKey; }         // Hardened child -> Use private key
     else { data = btcWallet.create(privateKey).publicKey; } // Normal child ---> Use public key
 
     data += format(index, 'dec', 'hex').padStart(8, '0');
@@ -233,3 +243,7 @@ const btcHDWallet = (function() {
 
 }());
 
+
+
+// 0304597b05d601aa0016a02286d88aedb74f0fe0da4f200cbfa244583fdb0c9a8c
+// 0304597b05d601aa0016a02286d88aedb74f0fe0da4f200cbfa244583fdb0c9a8c

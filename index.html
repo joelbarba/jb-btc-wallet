@@ -1,12 +1,12 @@
 <!doctype html>
 <html>
 <head>
-	<title>JB-BTC-WALLET</title>
-	<meta charset="utf-8">
-	<link rel="stylesheet" type="text/css" href="styles.css"></link>
+  <title>JB-BTC-WALLET</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="styles.css"></link>
 </head>
 <body>
-	<h1>JB BTC WALLET</h1>
+  <h1>JB BTC WALLET</h1>
 
   <div class="box" id="single-wallet">
     <h3>BTC Single Sig Wallet</h3>
@@ -143,14 +143,39 @@
 
     <br>
     <hr/>
-    <span class="key-label">Derived Child Key (from master):</span>
-    <span>Index:</span><input id="hdw-derived-key-index" value="5" style="width: 60px;"/>
-    <span>Hardened:</span><input type="checkbox" id="hdw-derived-key-hardened">
-    <span>(index + 2147483648)</span>
-    <button id="hdw-derived-key-calc">Calculate Derived Key</button>
+    <span class="key-label">Derived Child Keys:</span>
+    <br>
+    <span>Level 0 (purpose) --- Index:</span><input id="hdw-derived-key-index-0" value="84" style="width: 60px;"/>
+    <span>Hardened:</span><input id="hdw-derived-key-hardened-0" type="checkbox" checked="true">
+    <span>(2147483648 + index)</span>
+    <button id="hdw-derived-key-calc-0">Calculate Derived Key m/84'</button>
+    <br>
+    <span>Level 1 (coinType) -- Index:</span><input id="hdw-derived-key-index-1" value="0" style="width: 60px;"/>
+    <span>Hardened:</span><input id="hdw-derived-key-hardened-1" type="checkbox" checked="true">
+    <span>(2147483648 + index)</span>
+    <button id="hdw-derived-key-calc-1">Calculate Derived Key m/84'/0'</button>
+    <br>
+    <span>Level 2 (account) --- Index:</span><input id="hdw-derived-key-index-2" value="0" style="width: 60px;"/>
+    <span>Hardened:</span><input id="hdw-derived-key-hardened-2" type="checkbox" checked="true">
+    <span>(2147483648 + index)</span>
+    <button id="hdw-derived-key-calc-2">Calculate Derived Key m/84'/0'/0'</button>
+    <br>
+    <span>Level 3 (receiving) - Index:</span><input id="hdw-derived-key-index-3" value="0" style="width: 60px;"/>
+    <span>Hardened:</span><input id="hdw-derived-key-hardened-3" type="checkbox">
+    <span>(2147483648 + index)</span>
+    <button id="hdw-derived-key-calc-3">Calculate Derived Key m/84'/0'/0'/0</button>
+    <br>
+    <span>Level 4 (wallet) ---- Index:</span><input id="hdw-derived-key-index-4" value="0" style="width: 60px;"/>
+    <span>Hardened:</span><input id="hdw-derived-key-hardened-4" type="checkbox">
+    <span>(2147483648 + index)</span>
+    <button id="hdw-derived-key-calc-4">Calculate Derived Key m/84'/0'/0'/0/0</button>
     <div style="margin-left: 15px;">
       <span class="key-label">- Child Index -----------------> </span>
       <span id="hdw-child-index" class="key-value"></span>
+      <button id="hdw-derived-key-calc-next">+ 1 (next)</button>
+      <br/>
+      <span class="key-label">- Derivation Path -------------> </span>
+      <span id="hdw-child-path" class="key-value"></span>
       <br/>
       <span class="key-label">- Private Key (32 bytes HEX) --> </span>
       <span id="hdw-child-private-key" class="key-value"></span>
@@ -166,18 +191,14 @@
       <br/>
       <span class="key-label">- xPub (78 byte) --------------> </span>
       <span id="hdw-child-xpub" class="key-value"></span>
-    </div>
-
-    <br>
-    <hr/>
-    <button id="hdw-derived-key-calc">Calculate Key from Derivation Path</button>
-    <span>Derivation Path:</span><input id="hdw-derived-key-derivation-path" style="width: 120px;"/>
-    <div style="margin-left: 15px;">      
+      <br/>
+      <span class="key-label">- p2wpkh Address (42 chars) ---> </span>
+      <span id="hdw-child-address" class="key-value"></span>
     </div>
 
   </div>
 
-
+  
   <script type="text/javascript" src="jb-encoders.js"></script>
   <script type="text/javascript" src="jb-hashes.js"></script>
   <script type="text/javascript" src="jb-ecdsa.js"></script>
