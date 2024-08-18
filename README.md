@@ -8,20 +8,17 @@ The fact that no external libraries or native APIs have been used is to have a f
 
 ## JS Modules
 
-The project is structured in the following JS modules (IEEF):
+The project is structured in the following JS modules (scoped instances from IIEF):
 
-- Encoders
-- Hashes
-- ECDSA
-- Bip-39-seed
-- Sig-Wallet
-- HD-Wallet
-
+- Encoders (`jb-encoders.js`)
+- Hashes (`jb-hashes.js`)
+- ECDSA (`jb-ecdsa.js`)
+- Bip39-seed (`jb-bip39-seed.js`)
+- Sig-Wallet (`jb-sig-wallet.js`)
+- HD-Wallet (`jb-hd-wallet.js`)
 
 
 ### Encoders
-
-`jb-encoders.js`
 
 By default all values are in hexadecimal format as a string (not the 0x value, but the hex value in a js string).
 
@@ -46,9 +43,7 @@ encoders.format('F1E', 'hex', 'dec');
 
 
 
-### Hashes
-
-`jb-hashes.js`
+### Hashes (`jb-hashes.js`)
 
 This module is dependent on `jb-encoders.js`.
 

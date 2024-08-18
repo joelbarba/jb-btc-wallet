@@ -6,7 +6,7 @@ const format = encoders.format; // shortcut
 // -------------------------------------- Single Sig Wallet --------------------------------------
 
 let wallet = btcWallet.create('adf10f0b705a08a981615925eb2ce563b274547bd8c991468706e91d07feb388');
-console.log(wallet);
+console.log('Sig Wallet', wallet);
 
 displayWallet();
 
@@ -65,21 +65,6 @@ function loadFromWif(wif) {
 
 let hdWallet = btcHDWallet.loadSeedPhrase(['ripple', 'hat', 'helmet', 'develop', 'betray', 'panda', 'radio', 'zebra', 'payment', 'silver', 'physical', 'barely']);
 console.log('HD Wallet', hdWallet);
-
-const purpose   = hdWallet.masterKey.deriveKeyFn(84, true); // m/84'
-const coinType  = purpose.deriveKeyFn(0, true);             // m/84'/0'
-const account   = coinType.deriveKeyFn(0, true);            // m/84'/0'/0'
-const receiving = account.deriveKeyFn(0, false);            // m/84'/0'/0'/0
-
-console.log('Account xPub = ', account.xPub); // xpub6CEZMAuTZ4LJ7Dv4rBi5MEnUsoqyKFgbvjCGgruTe7UqcGV2XwEDuH3qpnZd51wxXTy7NQsjYiEbVKf6E3iTYwYoM747rSqQxgiCEnwroh2
-
-console.log('wallet0 addr = ', receiving.deriveKeyFn(0, false).p2wpkhBTCAddress);  // m/84'/0'/0'/0/0  = bc1qtut25h24c8v44jrapdzkr66gl0yj5s8xevh654
-console.log('wallet1 addr = ', receiving.deriveKeyFn(1, false).p2wpkhBTCAddress);  // m/84'/0'/0'/0/1  = bc1qn0654qnu76laean628ll547nvcmc74vkutnhxu
-console.log('wallet2 addr = ', receiving.deriveKeyFn(2, false).p2wpkhBTCAddress);  // m/84'/0'/0'/0/2  = bc1qghuj82uqsr2mkh7x54z22vf8lfxtttfyu9tm5l
-console.log('wallet3 addr = ', receiving.deriveKeyFn(3, false).p2wpkhBTCAddress);  // m/84'/0'/0'/0/3  = bc1qkgpjjjmxlcy4rf30tw60gncfrtxxhrkw4jzv8v
-
-const wallet0 = receiving.deriveKeyFn(0, false);
-console.log('wallet0 = ', wallet0);
 
 displayHDWallet();
 
@@ -200,14 +185,16 @@ function calcDeriveKeys(level = 0) {
   return [purpose, coinType, account, receiving, childWlt][level];
 }
 function displayDerivedKey(child) {
+  const derivePath = calcDerivedPath()[currentLevel];
   getEl('hdw-child-index').innerHTML       = child.index + '';
-  getEl('hdw-child-path').innerHTML        = calcDerivedPath()[currentLevel];
+  getEl('hdw-child-path').innerHTML        = derivePath;
   getEl('hdw-child-private-key').innerHTML = child.privateKey;
   getEl('hdw-child-public-key').innerHTML  = child.publicKey;
   getEl('hdw-child-chain-code').innerHTML  = child.chainCode;
   getEl('hdw-child-xprv').innerHTML        = child.xPrv;
   getEl('hdw-child-xpub').innerHTML        = child.xPub;
   getEl('hdw-child-address').innerHTML     = child.p2wpkhBTCAddress;
+  console.log('Derived Wallet', derivePath, child);
 }
 function calcDerivedPath() {
   const path0 = `m/${derivePath.level0.index + (derivePath.level0.hardened ? "'": "")}`;
