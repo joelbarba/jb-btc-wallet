@@ -141,7 +141,15 @@ const btcHDWallet = (function() {
   }
 
 
-
+  /****************************************************************************
+   * Derives a Private Extended Key
+   * Parameters:
+   * - xPrivateKey  String with the private extended key in HEX (key + chainCode)
+   * - index        Number with the index to derive
+   * - hardened     Boolean. If true, it adds 2147483648 to the index and derives it as a hardened key
+   * 
+   * It returns an object with the derived key: { privateKey, chainCode }
+   */
   function derivePrivateKey(xPrivateKey, index = 0, hardened = true) {
     // const orderOfTheCurve = 115792089237316195423570985008687907852837564279074904382605163141518161494337n; // https://en.bitcoin.it/wiki/Secp256k1
     const orderOfTheCurve = ecdsa.secp256k1.n;
@@ -173,6 +181,15 @@ const btcHDWallet = (function() {
     };
   }
 
+
+    /****************************************************************************
+   * Derives a Public Extended Key
+   * Parameters:
+   * - xPublicKey   String with the public extended key in HEX (key + chainCode)
+   * - index        Number with the index to derive (up to 2147483648)
+   * 
+   * It returns an object with the derived key: { publicKey, chainCode }
+   */
   function derivePublicKey(xPublicKey, index = 0) {
 
     const publicKey = xPublicKey.slice(0, 66);
@@ -225,12 +242,11 @@ const btcHDWallet = (function() {
   return { 
     create,           // (numWords, passphrase) => wallet             Creates a new random wallet
     loadSeedPhrase,   // (words[], passphrase) => wallet              Creates a wallet from a seed phrase (list of words)
-    xKeyEncode,
-    xKeyDecode,
-    derivePrivateKey,
-    derivePublicKey,
+    xKeyEncode,       // (keyType, depthLevel, index, key, chainCode, parentPubKey) => string   Converts an extended key into its base58 address format
+    xKeyDecode,       // (xKey) => ...                                Returns the raw hex value, and all the parameters of the key
+    derivePrivateKey, // (xPrivateKey, index, hardened) => { privateKey, chainCode }    Derives a Private Extended Key
+    derivePublicKey,  // (xPrivateKey, index) => { publicKey, chainCode }               Derives a Public Extended Key
   };
-
 
 
 

@@ -43,9 +43,9 @@ encoders.format('F1E', 'hex', 'dec');
 
 
 
-### Hashes (`jb-hashes.js`)
+### Hashes
 
-This module is dependent on `jb-encoders.js`.
+This module is dependent on `jb-encoders.js` ----> `jb-hashes.js`.
 
 It contains all the hashing operations + base58Check and Bech32 needed to run the bitcoin wallet generation.
 
@@ -73,9 +73,7 @@ hashes.sha256('AA37F');
 
 ### ECDSA
 
-`jb-ecdsa.js`
-
-This module is dependent on `jb-encoders.js` and `jb-hashes.js`.
+This module is dependent on (`jb-encoders.js`, `jb-hashes.js`) ----> `jb-ecdsa.js`.
 
 This module contains the main constants and methods to use ECDSA (Elliptic Curve Digital Signature Algorithm).
 
@@ -102,9 +100,7 @@ console.log(point); // Coordinates of G * point
 
 ### BIP 39 Seed
 
-`jb-bip39-seed.js`
-
-This module is dependent on `jb-encoders.js` and `jb-hashes.js`..
+This module is dependent on (`jb-encoders.js`, `jb-hashes.js`) ----> `jb-bip39-seed.js`.
 
 It contains the methods to handle the english word list to represent [BIP 39](https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki) Mnemonic Seed Phrase.
 
@@ -130,9 +126,7 @@ const seed = bip39seed.phraseToSeed(words, 'myPassphrase');
 
 ### Sig Wallet
 
-`jb-sig-wallet.js`
-
-This module is dependent on `jb-encoders.js`, `jb-hashes.js` and `jb-ecdsa.js`.
+This module is dependent on (`jb-encoders.js`, `jb-hashes.js`, `jb-ecdsa.js`) ----> `jb-sig-wallet.js`.
 
 It contains a `create()` function that generates an object with a Single Sig BTC Wallet.
 
@@ -156,3 +150,69 @@ Example:
 const pk = 'adf10f0b705a08a981615925eb2ce563b274547bd8c991468706e91d07feb388';
 const wallet = btcWallet.create(pk);
 ```
+
+
+### HD Wallet
+
+This module is dependent on (`jb-encoders.js`, `jb-hashes.js`, `jb-ecdsa.js`, `jb-bip39-seed.js`) ----> `jb-hd-wallet.js`.
+
+It contains a `create()` function that generates an object with a Hierarchical Deterministic BTC Wallet.
+
+It also contains a `loadSeedPhrase(words[])` function where you can create the wallet from an existing seed phrase mnemonic (list of words).
+You can use 12, 15, 18, 21 or 24 words seed phrase, from [the BIP39 english words list](https://github.com/bitcoinjs/bip39/blob/master/src/wordlists/english.json)
+
+It also provides a function to encode extended keys from its raw hex format to base58 address: `xKeyEncode(keyType, depthLevel, index, key, chainCode, parentPubKey) => string`.
+
+And another function to decode them back: `xKeyDecode(xKey)`.
+
+The values on the wallet object created:
+
+```
+- privateKey          : 32 bytes (HEX) - Private key
+- publicKey           : 33 bytes (HEX) - Compressed Public key
+- uncompressedPubKey  : 65 bytes (HEX) - Unompressed Public key
+- pubKeyXCoordinate   : 32 bytes (HEX) - X Coordinate of the ECDSA public key point
+- pubKeyYCoordinate   : 32 bytes (HEX) - Y Coordinate of the ECDSA public key point
+- p2pkhBTCAddress     : 34 chars (Base58) - BTC Address (for P2PKH locking script)
+- p2wpkhBTCAddress    : 42 chars (Bech32) - BTC Address (for P2WPKH locking script)  bc1...
+- wif                 : 51 chars (Base58) - Private key WIF format, with uncompress public key indicator
+- wifCompressed       : 52 chars (Base58) - Private key WIF format, with compress public key indicator
+
+- seedPhraseMnemonic   : string[12~24] - Private key
+- passphrase           : string - Phasephrase protecting the master seed generation from words
+- seedPhraseHex        : 16~32 bytes (HEX): Seed Phrase in HEX value
+- masterSeedHex        : 64 bytes (HEX): Master seed value (after PBKDF2 with passphrase)
+- masterKey            : {} Object with the master extended keys
+   - chainCode : 32 bytes (HEX) - The Chaincode of the extended key
+   - xPrvHex   : 64 bytes (HEX) - Private Extended Key in HEX value (private key + chaincode)
+   - xPubHex   : 64 bytes (HEX) - Public Extended Key in HEX value (public key + chaincode)
+   - xPrv      : 78 byte (Base58) - Private ext key serialized (address format)
+   - xPub      : 78 byte (Base58) - Public ext key serialized (address format)
+   - ...wallet : {} Object with the Single Sig Wallet for this key (jb-sig-wallet instance)
+   - children  : [] Array with all calculated derived keys
+   - deriveKeyFn : (index, hardened) => childKey
+```
+
+Example:
+```javascript
+const seedPhrase = 'almost wrap clip enrich drip edge pink sketch rich addict tell column'.split(' ');
+let hdWallet = btcHDWallet.loadSeedPhrase(seedPhrase);
+
+const purpose   = hdWallet.masterKey.deriveKeyFn(84, true); // m/84'
+const coinType  = purpose.deriveKeyFn(0, true);             // m/84'/0'
+const account   = coinType.deriveKeyFn(0, true);            // m/84'/0'/0'
+const receiving = account.deriveKeyFn(0, false);            // m/84'/0'/0'/0
+
+console.log('Account xPub = ', account.xPub); // xpub6CEZ....
+console.log(`m/84'/0'/0'/0/0 = `, receiving.deriveKeyFn(0, false).p2wpkhBTCAddress);
+console.log(`m/84'/0'/0'/0/1 = `, receiving.deriveKeyFn(1, false).p2wpkhBTCAddress);
+console.log(`m/84'/0'/0'/0/2 = `, receiving.deriveKeyFn(2, false).p2wpkhBTCAddress);
+console.log(`m/84'/0'/0'/0/3 = `, receiving.deriveKeyFn(3, false).p2wpkhBTCAddress);
+```
+
+Both the masterKey and every derived key have a `deriveKeyFn` linked that can be used as a shortcut to derive themselves into their list of childs.
+These are always derived as extended privated keys.
+
+You can also derive keys independently using the module functions:
+- `derivePrivateKey(xPrivateKey, index, hardened) => { privateKey, chainCode }` To derive private extended keys
+- `derivePublicKey(xPrivateKey, index) => { publicKey, chainCode }` To derive public extended keys
