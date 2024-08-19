@@ -14,7 +14,7 @@ function displayWallet() {
   getEl('private-key-hex-input').value = wallet.privateKey;
   getEl('private-key-wif-input').value = wallet.wif;
   getEl('private-key-wif-comp-input').value = wallet.wifCompressed;
-  getEl('private-key-dec').innerHTML = format(wallet.privateKey, 'hex', 'dec');
+  getEl('private-key-dec').innerHTML = BigInt('0x' + wallet.privateKey);
   
   const bin = format(wallet.privateKey, 'hex', 'bin');
   const binStr = bin.split('').map((c,i) => (i%64 ? '': '-') + (i%8 ? '': ' ') + c).join('').slice(2).split('- ').join('<br/>');
