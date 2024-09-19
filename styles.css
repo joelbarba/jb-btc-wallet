@@ -10,6 +10,7 @@
   background-color: #009900;
   margin: 0 -30px 20px;
   padding: 10px 15px;
+  color: white;
 }
 
 .box#functions-box {  
@@ -48,4 +49,11 @@
   font-family: monospace;
   margin: 2px 20px 0;
   display: inline-block;
+}
+
+.subtitle {
+  font-weight: bold;
+  margin-top: 20px;
+  display: block;
+  font-size: 16px;
 }

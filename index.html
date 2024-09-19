@@ -8,6 +8,74 @@
 <body>
   <h1>JB BTC WALLET</h1>
 
+  <div class="box" id="tx-generator">
+    <h3>BTC Transaction Generator</h3>
+
+    <span class="subtitle">UTXO to spend:</span>
+    <div style="display: flex;">
+      <div>
+        <br/>
+        <span style="font-weight: bold;">Raw Previous Tx Data (HEX) --------------> </span><br/>
+        <button style="margin-top: 10px;" id="utxo-load-raw">Load UTXO from raw data</button>
+      </div>
+      <textarea id="utxo-raw-input" rows="4" cols="350" class="key-input" style="vertical-align: top; margin: 5px 0 0 18px; width: 1146px;"></textarea>
+    </div>
+    <span class="key-label">TXID (HEX - 32 bytes normal order) ------> </span>
+    <input id="utxo-txid-input" class="key-input"/>    
+    <button id="utxo-load-utxo-from">Load UTXO from https://blockchain.info</button>
+    <a id="utxo-link" style="margin-left: 20px;" target="blank" href="https://learnmeabitcoin.com/explorer/tx/6ae73833e5f58616445bfe35171e89b23c5b59ef585637537f6ba34a019449ac">Check out tx on blockchain explorer</a>
+    <br/>
+    <div style="position: relative;">
+      <span class="key-label">VOUT (DEC) ------------------------------> </span>
+      <input id="utxo-vout-input" class="key-input" style="max-width: 70px;"/>
+      <span id="utxo-vout-size" class="key-value"></span>
+      <div style="position: absolute; top: 7px; left: 992px;">
+        <button id="utxo-check-btn">Check if it was already spent</button>
+        <span id="utxo-spent-warning" style="margin: 0 10px;" class="key-value"></span>
+      </div>
+    </div>
+    <span style="font-weight: bold;">- output[vout].amount (DEC) -------------> </span>
+    <span id="utxo-output-amount" class="key-value">0 sats = 00000000 (little-endian)</span>
+    <br/>
+    <span style="font-weight: bold;">- output[vout].scriptPubKey (HEX) -------> </span>
+    <input id="utxo-scriptpubkey-input" class="key-input"/>
+    <span id="utxo-script-size" class="key-value">0 bytes (0x00)</span>
+    <div style="font-family: monospace; margin-left: 347px; font-size: 11px; color: gray">
+      <p style="margin: 3px 0;" id="utxo-script-hrdata">Script -------> OP_0 + OP_PUSHBYTES_20 + aa966f56de599b4094b61aa68a2b3df9e97e9c48</p>
+      <p style="margin: 3px 0;" id="utxo-script-type"  >Script Type --> P2PKH (Pay to Public Key Hash) - Legacy</p>
+      <p style="margin: 3px 0;" id="utxo-script-pkh"   >PubKeyHash ---> 38c0f3b9233b5da6798290244ae59b2a2489507e</p>
+      <p style="margin: 3px 0;" id="utxo-script-addr"  >BTC Address --> 16B5zHZY88D6v4QqzUMWRXGAKFXxYdoEoD</p>
+    </div>
+    <span class="key-label">Private Key (HEX - 32 bytes) ------------> </span>
+    <input id="utxo-private-key-input" class="key-input"/>
+    <span id="utxo-private-key-check" class="key-value">✔ (valid)</span>
+
+    <hr>
+    <span class="subtitle">New Transaction:</span>
+    <span class="key-label">BTC Address (destination) ---------------> </span>
+    <input id="tx-btc-address-input" class="key-input"/>
+    <span id="tx-btc-address-info" class="key-value"></span>
+    <br/>
+    <span class="key-label">Amount to transfer (DEC) ----------------> </span>
+    <input id="tx-amount-input" class="key-input" style="width: 100px;"/>
+    <span id="tx-output-amount-lie" class="key-value">= 00000000 (little-endian)</span>    
+    <br/>
+    <span class="key-label">Fee (utxo - amount) ---------------------> </span>
+    <span id="tx-output-fee" class="key-value">0 (sats)</span>
+    <br/>
+    <span class="key-label">Optional embedded message ---------------> </span>
+    <input id="tx-message-input" class="key-input"/>
+    <span id="tx-output-msg" class="key-value">*Adds an extra output with a message after OP_RETURN</span>    
+    <br/>
+    <br/>
+    <button id="tx-clear">Clear</button>
+    <button id="tx-create-transaction">Generate New Transaction</button>
+    <span style="font-weight: bold;">Raw Transaction Data (HEX):</span><br/>
+    <textarea id="tx-raw-input" rows="5" cols="400" class="key-input" style="width: 1500px; margin: 5px 0px;"></textarea>
+    <p id="tx-data-info" style="margin: 0; line-height: 16px; font-size: 11px; color: gray"></p>
+    <p style="margin-top: 10px;">Send it to the network with: $ <b>bitcoin-cli sendrawtransaction [rawTxData]</b></p>
+  </div>
+
   <div class="box" id="single-wallet">
     <h3>BTC Single Sig Wallet</h3>
     <button id="clear-all-btn" style="margin-bottom: 15px;">Clear</button>
@@ -52,6 +120,9 @@
 
 
     <hr/>
+    <span class="key-label">Public Key Hash (20 bytes) -------> </span>
+    <span id="sig-wallet-public-key-hash" class="key-value"></span>
+    <br/>
     <span class="key-label">BTC P2PKH Address (34 chars) -----> </span>
     <span id="btc-address-p2pkh" class="key-value"></span>
     <br/>
@@ -120,24 +191,27 @@
     <button id="hdw-btn-recalc-seed">Recalculate Master Seed</button>
 
     <br/>
-    <span class="key-label">Master Seed (64 bytes HEX) --> </span>
+    <span class="key-label">Master Seed (64 bytes HEX) -----> </span>
     <span id="hdw-master-seed" class="key-value">ffffffffff</span>
     <hr/>
     <span class="key-label">Master Key:</span>
     <div style="margin-left: 15px;">
-      <span class="key-label">- Private Key (32 bytes HEX) --> </span>
+      <span class="key-label">- Private Key (32 bytes HEX) ------> </span>
       <span id="hdw-master-private-key" class="key-value">ffffffffff</span>  
       <br/>
-      <span class="key-label">- Public Key (32 bytes HEX) ---> </span>
+      <span class="key-label">- Public Key (32 bytes HEX) -------> </span>
       <span id="hdw-master-public-key" class="key-value">ffffffffff</span>  
       <br/>
-      <span class="key-label">- Chain Code (32 bytes HEX) ---> </span>
+      <span class="key-label">- Public Key Hash (20 bytes HEX) --> </span>
+      <span id="hdw-master-public-key-hash" class="key-value">ffffffffff</span>  
+      <br/>
+      <span class="key-label">- Chain Code (32 bytes HEX) -------> </span>
       <span id="hdw-master-chain-code" class="key-value">ffffffffff</span>
       <br/>
-      <span class="key-label">- xPrv (78 byte) --------------> </span>
+      <span class="key-label">- xPrv (78 byte) ------------------> </span>
       <span id="hdw-master-xprv" class="key-value">ffffffffff</span>
       <br/>
-      <span class="key-label">- xPub (78 byte) --------------> </span>
+      <span class="key-label">- xPub (78 byte) ------------------> </span>
       <span id="hdw-master-xpub" class="key-value">ffffffffff</span>
     </div>
 
@@ -170,29 +244,32 @@
     <span>(2147483648 + index)</span>
     <button id="hdw-derived-key-calc-4">Calculate Derived Key m/84'/0'/0'/0/0</button>
     <div style="margin-left: 15px;">
-      <span class="key-label">- Child Index -----------------> </span>
+      <span class="key-label">- Child Index ----------------------> </span>
       <span id="hdw-child-index" class="key-value"></span>
       <button id="hdw-derived-key-calc-next">+ 1 (next)</button>
       <br/>
-      <span class="key-label">- Derivation Path -------------> </span>
+      <span class="key-label">- Derivation Path ------------------> </span>
       <span id="hdw-child-path" class="key-value"></span>
       <br/>
-      <span class="key-label">- Private Key (32 bytes HEX) --> </span>
+      <span class="key-label">- Private Key (32 bytes HEX) -------> </span>
       <span id="hdw-child-private-key" class="key-value"></span>
       <br/>
-      <span class="key-label">- Public Key (32 bytes HEX) ---> </span>
-      <span id="hdw-child-public-key" class="key-value"></span>  
+      <span class="key-label">- Public Key (32 bytes HEX) --------> </span>
+      <span id="hdw-child-public-key" class="key-value"></span>
       <br/>
-      <span class="key-label">- Chain Code (32 bytes HEX) ---> </span>
+      <span class="key-label">- Public Key Hash (20 bytes HEX) ---> </span>
+      <span id="hdw-child-public-key-hash" class="key-value"></span>
+      <br/>
+      <span class="key-label">- Chain Code (32 bytes HEX) --------> </span>
       <span id="hdw-child-chain-code" class="key-value"></span>
       <br/>
-      <span class="key-label">- xPrv (78 byte) --------------> </span>
+      <span class="key-label">- xPrv (78 byte) -------------------> </span>
       <span id="hdw-child-xprv" class="key-value"></span>
       <br/>
-      <span class="key-label">- xPub (78 byte) --------------> </span>
+      <span class="key-label">- xPub (78 byte) -------------------> </span>
       <span id="hdw-child-xpub" class="key-value"></span>
       <br/>
-      <span class="key-label">- p2wpkh Address (42 chars) ---> </span>
+      <span class="key-label">- p2wpkh Address (42 chars) --------> </span>
       <span id="hdw-child-address" class="key-value"></span>
     </div>
 
@@ -205,6 +282,7 @@
   <script type="text/javascript" src="jb-bip39-seed.js"></script>
   <script type="text/javascript" src="jb-sig-wallet.js"></script>
   <script type="text/javascript" src="jb-hd-wallet.js"></script>
+  <script type="text/javascript" src="jb-btc-tx.js"></script>
 
   <script type="text/javascript" src="main.js"></script>
 

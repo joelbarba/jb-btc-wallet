@@ -7,7 +7,6 @@ const hashes = (function() {
     hash256,     // (hex) => hex
     hash160,     // (hex) => hex
     base58Check, // (hex) => b58
-    bech32,      // (hex) => bech32
     hmac512,     // (key hex, msg hex) => hex
     pbkdf2,      // (password hex, salt hex, iterations, dkLen) => hex
   };
@@ -25,7 +24,7 @@ const hashes = (function() {
    *******************************************************************************************/
   function base58Check(hexStr) { return encoders.format(hexStr + hash256(hexStr).slice(0, 8), 'hex', 'b58'); }
 
-
+  
 
   /*******************************************************************************************
    *  No dependency implementation of the SHA-256
@@ -463,62 +462,6 @@ const hashes = (function() {
 
 
 
-  /*******************************************************************************************
-   *  No dependency implementation of the BECH32 encoding (BIP-173)
-   *  - Input  : String representing a HEX value
-   *  - Output : String representing a Bech32
-   * 
-   *  Ex: const address = hashes.bech32(hash160('0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798'));
-   * 
-   *  Based on https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki#Bech32
-   *******************************************************************************************/
-  function bech32(hexStr, version = 0) {
-    const BECH32DICT = `qpzry9x8gf2tvdw0s3jn54khce6mua7l`;
-
-    const bin = encoders.format(hexStr, 'hex', 'bin').padStart(160, '0');
-    // console.log('8 bit = ', bin.split('').map((c,i) => (i%8 ? '': ' ') + c).join('').slice(1));
-    // console.log('5 bit = ', bin.split('').map((c,i) => (i%5 ? '': ' ') + c).join('').slice(1));
-    
-    const bin5bit = bin.split('').map((c,i) => (i%5 ? '': ' ') + c).join('').slice(1).split(' ');
-    
-    // const hexPart = bin5bit.map(n => encoders.format(n, 'bin', 'hex').padStart(2, '0'));
-    // console.log(hexPart.join('')); // 0e140f070d1a001912060b0d081504140311021d030c1d03040f1814060e1e16
-    
-    const decArr5bit = [version].concat(bin5bit.map(n => encoders.format(n, 'bin', 'dec'))); // Adding version byte (0) and turning it into a dec array
-    const checksumArr = createChecksum(decArr5bit); // 0c 07 09 11 0b 15  =  0c0709110b15 ---> v8f3t4
-    
-    const data = decArr5bit.map(c => BECH32DICT[c]).join('');       // qw508d6qejxtdg4y5r3zarvary0c5xw7k
-    const checksum = checksumArr.map(c => BECH32DICT[c]).join('');  // v8f3t4
-    
-    return data + checksum;  // qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t5
-    
-    // Data should be an array of integers [31, 47, 28, ...] representing the bytes to encode
-    // It returns an array of 6 integers with the checksum values
-    function createChecksum(data, enc = 'bech32') {
-      const hrp = [3, 3, 0, 2, 3]; // 'bc'
-      var values = [...hrp, ...data, 0, 0, 0, 0, 0, 0];
-    
-      const GENERATOR = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3];
-      let chk = 1;
-      for (let p = 0; p < values.length; ++p) {
-        let top = chk >> 25;
-        chk = (chk & 0x1ffffff) << 5 ^ values[p];
-        for (let i = 0; i < 5; ++i) {
-          if ((top >> i) & 1) { chk ^= GENERATOR[i]; }
-        }
-      }
-    
-      const mod = enc === 'bech32' ? chk : chk ^ 0x2bc830a3;
-    
-      const ret = [];
-      for (let p = 0; p < 6; ++p) {
-        ret.push((mod >> 5 * (5 - p)) & 31);
-      }
-      return ret;
-    }
-    
-  }
-
 
   // Private function
   // Performs the XOR op betwee 2 values represented in hex in a string
@@ -587,7 +530,7 @@ const hashes = (function() {
 
 
   /*******************************************************************************************
-   *  No dependency implementation of the PBKDF2
+   *  No dependency implementation of the PBKDF2 (Password-Based Key Derivation Function 2)
    *  - Input1 : password in HEX (string)
    *  - Input2 : Key in HEX (string)
    *  - Output : Derived key in HEX (string)

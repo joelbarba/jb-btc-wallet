@@ -35,7 +35,13 @@ Here's the different formats a value can be transformed from/to:
   - dec = decimal (BigInt)
   - hex = hexadecimal (string 'FF' = 1byte)
   - b58 = base58
+  - b32 = bech32
   - str = plain text string
+  - rev = hex with byte order reversed
+  - lie = little-endian (hex with byte order reversed pad to 4 bytes)
+  - com = compact-size (dynamic 1, 3, 5 or 9 bytes value encoding)
+  - sig = ecdsa signature (Array of 2 BigInts [r, s])
+  - der = DER Encoding (Distinguished Encoding Rules) of a signature (in hex)  
 
 The module exports the `format(value, formatIn, formatOut)` function, which takes 3 parameters: the value to convert from, the format from and the format to.
 
@@ -50,9 +56,9 @@ encoders.format('F1E', 'hex', 'dec');
 
 This module is dependent on `jb-encoders.js` ----> `jb-hashes.js`.
 
-It contains all the hashing operations + base58Check and Bech32 needed to run the bitcoin wallet generation.
+It contains all the hashing operations + base58Check needed to run the bitcoin wallet generation.
 
-All input/output parameters are in hexadecimal strings, except base58Check and Bech32 returned values.
+All input/output parameters are in hexadecimal strings, except base58Check returned values.
 There is a function for each of the following operations:
 
 ```
@@ -62,7 +68,6 @@ There is a function for each of the following operations:
   - hash256      --> (hex) => hex
   - hash160      --> (hex) => hex
   - base58Check  --> (hex) => b58
-  - bech32       --> (hex) => bech32
   - hmac512      --> (key hex, msg hex) => hex
   - pbkdf2       --> (password hex, salt hex, iterations, dkLen) => hex
 ```

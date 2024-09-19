@@ -14,14 +14,14 @@ const ecdsa = (function() {
   };
 
   // Apply mod p, and make sure it's > 0
-  function mod(x) {
-    x = x % secp256k1.p;
-    if (x < 0) { x += secp256k1.p; } 
+  function mod(x, modVal = secp256k1.p) {
+    x = x % modVal;
+    if (x < 0) { x += modVal; } 
     return x;
   };
 
-  function inverse(a) {
-    const next = { a, m: secp256k1.p, y: 1n, z: 0n };
+  function inverse(a, modVal = secp256k1.p) {
+    const next = { a, m: modVal, y: 1n, z: 0n };
     while (next.a > 1) {
       const curr = { ...next };
       const q = curr.m / curr.a;
@@ -30,7 +30,7 @@ const ecdsa = (function() {
       next.a = curr.m % curr.a;
       next.m = curr.a;
     }
-    return mod(next.y);
+    return mod(next.y, modVal);
   };
 
   function double([x, y]) {
@@ -125,6 +125,59 @@ const ecdsa = (function() {
   }
  
 
+  // Calculate a point on the curve for the public key ---> y = sqr(x^3 + 7 mod p)
+  // The compress public key starts with 02 or 03, to tell if Y is even or odd.
+  function pubKeyPoint(publicKey) {
+    const xCoor = BigInt('0x' + publicKey.slice(2, 66));
+    const yy = (xCoor ** 3n + 7n) % secp256k1.p;
+    let yCoor = modSqrt(yy, secp256k1.p);
+
+    // Use the other root if the parity doesn't match
+    const isPubKeyOdd = publicKey.slice(0, 2) === '03';
+    const isYOdd = yCoor % 2n === 1n;
+    if (isPubKeyOdd !== isYOdd) { yCoor = secp256k1.p - yCoor; }
+
+    const pubKeyPoint = [xCoor, yCoor];
+    return pubKeyPoint;
+  }
+
+  // Sign a message with a private key
+  function sign(msgHex, privateKeyHex, k) {
+    const randomBytes = crypto.getRandomValues(new Uint8Array(32));
+    k = k || BigInt('0x' + [...randomBytes].map(v => v.toString(16).padStart(2, '0')).join(''));
+    // const k = 12345n; // 0x3039
+    // console.log('k = ', format(k, 'dec', 'hex'));
+  
+    const [x, y] = mult(secp256k1.G, k);
+    let r = x % secp256k1.n;
+  
+    // s = k-1*(z + privateKey * r) mod n
+    const d = BigInt('0x' + privateKeyHex);
+    const z = BigInt('0x' + msgHex);
+ 
+    let inverseK = inverse(k, secp256k1.n);
+    const sHigh = (inverseK * (z + d * r)) % secp256k1.n;
+    let s = sHigh;
+    if (s > secp256k1.n / 2n) { s = secp256k1.n - sHigh; } // check if we need to convert it to the low value
+  
+    return [r, s];
+  }
+
+  function verifySig(msgHex, signature, pubKeyHex) {
+    const z = BigInt('0x' + msgHex);
+    const [r, s] = signature;
+    const inverseS = inverse(s, secp256k1.n);
+    const point1 = mult(secp256k1.G, inverseS * z);    
+    
+    const q = pubKeyPoint(pubKeyHex);
+    const point2 = mult(q, inverseS * r);
+    // console.log('pubKeyPoint q =', q);
+    
+    const point3 = add(point1, point2);
+    // console.log('Point 3[x] = ', point3[0]);
+    return point3[0] === r;
+  }
+
 
   // tests();
 
@@ -137,13 +190,38 @@ const ecdsa = (function() {
     mult,         // ([x, y], mul) => [x, y]          Multiplies a point by a value
     modPow,       // (value, exp, mod) => value       Modular power operation
     modSqrt,      // (value) => value                 Modular Square Root operation (Tonelli-Shanks algorithm)
+    pubKeyPoint,  // (pubHex) => [x, y]               Returns the [x, y] point coordinates of a compressed public key
+    sign,         // (msgHex, pkHex) => [r, s]        Signs a message and returns the [r, s] signing values
+    verifySig,    // (msgHex, signature, pubKeyHex)   Verifies (true/false) the message against the signature and it's compressed public key
   };
 
 
   // ------------------------------------------------------------------------------------
   // Tests
   function tests() {
+
+    function signVerify() {
+      const msgHex = 'e46bf164b0960d3a3b5612cbac4a691c31b71e26d45c7f8ade7be23727809775';
+      const privateKey = 'f94a840f1e1a901843a75dd07ffcc5c84478dc4f987797474c9393ac53ab55e6';
+      const pubKey = '024aeaf55040fa16de37303d13ca1dde85f4ca9baa36e2963a27a1c0c1165fe2b1';
+  
+      const signature = sign(msgHex, privateKey);
+      // console.log('Signature = ', signature);
+      const isRight = verifySig(msgHex, signature, pubKey);
+      // console.log('Verification = ', isRight);
+      if (!isRight) { console.error('ECDSA Sign / Verify error'); }
+
+      // We mustn't do this, but because of k randomness, the only way to test is by forcing k = 12345 = 0x3039:
+      const [r, s] = sign(msgHex, privateKey, 12345n);
+      if (r !== 108607064596551879580190606910245687803607295064141551927605737287325610911759n) { console.error(`Error ecdsa.sign() wrong r value`, r); }
+      if (s !== 42001087466938150539821028832855854854604982353441333885146378571977282687206n)  { console.error(`Error ecdsa.sign() wrong s value`, s); }
+      // z = 103318048148376957923607078689899464500752411597387986125144636642406244063093n;
+      // d = 112757557418114203588093402336452206775565751179231977388358956335153294300646n;
+    }
+
+    signVerify();
   }
+  
   
 
 }());

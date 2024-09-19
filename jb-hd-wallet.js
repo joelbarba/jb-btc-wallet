@@ -206,16 +206,7 @@ const btcHDWallet = (function() {
     const hmacPoint = ecdsa.mult(ecdsa.secp256k1.G, BigInt('0x' + tmpKey)); // Multiply by the generator to get the ECDSA point
 
     // Calculate the point on the curve for the public key ---> y = sqr(x^3 + 7 mod p)
-    const xCoor = BigInt('0x' + publicKey.slice(2, 66));
-    const yy = (xCoor ** 3n + 7n) % ecdsa.secp256k1.p;
-    let yCoor = ecdsa.modSqrt(yy, ecdsa.secp256k1.p);
-
-    // Use the other root if the parity doesn't match
-    const isPubKeyOdd = publicKey.slice(0, 2) === '03';
-    const isYOdd = yCoor % 2n === 1n;
-    if (isPubKeyOdd !== isYOdd) { yCoor = ecdsa.secp256k1.p - yCoor; }
-
-    const pubKeyPoint = [xCoor, yCoor];
+    const pubKeyPoint = ecdsa.pubKeyPoint(publicKey);
 
     const [x, y] = ecdsa.add(hmacPoint, pubKeyPoint); // Calculate the new point
     const compressedPubKey = (y % 2n ? '03' : '02') + format(x, 'dec', 'hex').padStart(64, '0');
