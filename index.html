@@ -73,7 +73,9 @@
     <span style="font-weight: bold;">Raw Transaction Data (HEX):</span><br/>
     <textarea id="tx-raw-input" rows="5" cols="400" class="key-input" style="width: 1500px; margin: 5px 0px;"></textarea>
     <p id="tx-data-info" style="margin: 0; line-height: 16px; font-size: 11px; color: gray"></p>
-    <p style="margin-top: 10px;">Send it to the network with: $ <b>bitcoin-cli sendrawtransaction [rawTxData]</b></p>
+    <p style="margin-top: 10px;">Send it to the network with: $ <b>bitcoin-cli sendrawtransaction [rawTxData]</b>
+      <span style="margin-left: 15px;">or publish it here: <a href="https://btc.com/tools/tx/publish" target="_blank">https://btc.com/tools/tx/publish</a></span>
+    </p>
   </div>
 
   <div class="box" id="single-wallet">
@@ -269,8 +271,11 @@
       <span class="key-label">- xPub (78 byte) -------------------> </span>
       <span id="hdw-child-xpub" class="key-value"></span>
       <br/>
+      <span class="key-label">- p2pkh Address (34 chars) ---------> </span>
+      <span id="hdw-child-addr-p2pkh" class="key-value"></span>
+      <br/>
       <span class="key-label">- p2wpkh Address (42 chars) --------> </span>
-      <span id="hdw-child-address" class="key-value"></span>
+      <span id="hdw-child-addr-p2wpkh" class="key-value"></span>
     </div>
 
   </div>

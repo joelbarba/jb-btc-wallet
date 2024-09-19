@@ -29,7 +29,7 @@ const btcTx = (function() {
   
 
     // Adds an output to the transaction, with the amount and the locking script (scriptPubKey)
-    // Depending on the scriptName, data = Btc Address / Script Hash / Message / Public Key
+    // Depending on the scriptName, data = Btc Address / Message / Public Key
     tx.addOutput = function(scriptName = 'P2WPKH', amountSats = 0, data) {
       let scriptPubKey = '';
       if (scriptName === 'P2PK')      { scriptPubKey = lock_P2PK_Script(data);   } // data = public key
@@ -158,10 +158,10 @@ const btcTx = (function() {
     tx.version = getLittleEndian();
 
     let inputCount = getCompactSize();
-    if (inputCount === 0) { // In that case inputCount is actually the marker field
+    if (!inputCount) { // In that case inputCount is actually the marker field
       tx.isSegWit = true;
       tx.marker = 0;
-      tx.flag = getNext();
+      tx.flag = getNext(1);
       inputCount = getCompactSize();
     }
 
@@ -389,10 +389,11 @@ const btcTx = (function() {
   }
 
   // Generates the P2SH locking script
-  function lock_P2SH_Script(scriptHash) { // btc address starting with "3v"
+  function lock_P2SH_Script(btcAddress) { // btc address starting with "3v"
     // OP_HASH160
     // OP_PUSHBYTES_20 <redeem script hash>
     // OP_EQUAL
+    const scriptHash = btcWallet.addressToHash(btcAddress);
     const hashSize = Math.ceil(scriptHash.length / 2); // should be always 20 bytes
     let script = opCodeToHex('OP_HASH160');
     script += opCodeToHex('OP_PUSHBYTES_' + hashSize) + scriptHash;

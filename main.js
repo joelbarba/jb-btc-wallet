@@ -97,7 +97,7 @@ getEl('utxo-check-btn').addEventListener('click', async () => {
           if (!response.ok) { throw new Error(`Response status: ${response.status}`); }
           const addrData = await response.json();
           console.log(addrData);
-          const nextTxId = addrData.txs.find(tx => tx.inputs.filter(i => i.prev_out.addr === address))?.hash;
+          const nextTxId = addrData.txs.find(tx => tx.inputs.filter(i => i.prev_out.addr === address).length)?.hash;
           if (nextTxId) {
             const url = `https://learnmeabitcoin.com/explorer/tx/${nextTxId}`;
             getEl('utxo-spent-warning').innerHTML += ` here: <a target="blank" href="${url}">TXID: ${nextTxId}</a>`;
@@ -233,7 +233,8 @@ getEl('tx-create-transaction').addEventListener('click', () => {
   console.log('New TX:', newTx);
 
   let txData = ``, br = `<br/>`;
-  txData += `TXID ----------------------> ${newTx.txId} / (reverted) = ${format(newTx.txId, 'hex', 'rev')}`;
+  txData += `TXID ----------------------> ${newTx.txId} <a href="https://learnmeabitcoin.com/explorer/tx/${newTx.txId}" target="_blank">(link)</a>`;
+  txData += ` / (reverted) = ${format(newTx.txId, 'hex', 'rev')}`;
   txData += br + `isSegWit ------------------> ${newTx.isSegWit} ${newTx.isSegWit ? '(because it unlocks a segwit input)':''}`;
   if (input.scriptSig) { txData += br + `inputs[0].scriptSig -------> (${utxoScriptName}): ${btcTx.translateScript(input.scriptSig).join(' + ')}`; }
   if (newTx.witness?.length > 0) { txData += br + `witness[0] ----------------> (signature): ${newTx.witness[0]}`; }
@@ -309,7 +310,8 @@ function loadFromWif(wif) {
 
 
 
-let hdWallet = btcHDWallet.loadSeedPhrase(['ripple', 'hat', 'helmet', 'develop', 'betray', 'panda', 'radio', 'zebra', 'payment', 'silver', 'physical', 'barely']);
+// let hdWallet = btcHDWallet.loadSeedPhrase(['ripple', 'hat', 'helmet', 'develop', 'betray', 'panda', 'radio', 'zebra', 'payment', 'silver', 'physical', 'barely']);
+let hdWallet = btcHDWallet.loadSeedPhrase(['tray', 'disagree', 'venue', 'end', 'toddler', 'neutral', 'outside', 'trick', 'frozen', 'fan', 'father', 'fine']);
 console.log('HD Wallet', hdWallet);
 
 displayHDWallet();
@@ -368,7 +370,8 @@ document.getElementById('clear-hd-wallet-btn').addEventListener('click', functio
   getEl('hdw-child-chain-code').innerHTML       = '';
   getEl('hdw-child-xprv').innerHTML             = '';
   getEl('hdw-child-xpub').innerHTML             = '';
-  getEl('hdw-child-address').innerHTML          = '';
+  getEl('hdw-child-addr-p2pkh').innerHTML       = '';
+  getEl('hdw-child-addr-p2wpkh').innerHTML      = '';
 });
 
 
@@ -443,7 +446,8 @@ function displayDerivedKey(child) {
   getEl('hdw-child-chain-code').innerHTML       = child.chainCode;
   getEl('hdw-child-xprv').innerHTML             = child.xPrv;
   getEl('hdw-child-xpub').innerHTML             = child.xPub;
-  getEl('hdw-child-address').innerHTML          = child.p2wpkhBTCAddress;
+  getEl('hdw-child-addr-p2pkh').innerHTML       = child.p2pkhBTCAddress;
+  getEl('hdw-child-addr-p2wpkh').innerHTML      = child.p2wpkhBTCAddress;
   console.log('Derived Wallet', derivePath, child);
 }
 function calcDerivedPath() {
