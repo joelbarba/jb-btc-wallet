@@ -324,7 +324,7 @@ document.getElementById('generate-hd-wallet-btn').addEventListener('click', func
 });
 
 document.getElementById('hdw-btn-load-from-sphex').addEventListener('click', function() {
-  const words = bip39.hexToPhrase(getEl('seed-phrase-hex-input').value);
+  const words = bip39seed.hexToPhrase(getEl('seed-phrase-hex-input').value);
   hdWallet = btcHDWallet.loadSeedPhrase(words);
   displayHDWallet();
 });
