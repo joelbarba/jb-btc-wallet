@@ -45,7 +45,7 @@ const btcTx = (function() {
     }
   
     // Adds an input, alonside a sign() function that creates the signature and the unlocking scriptSig
-    tx.addInput = function(txid, vout, sequence = 'FFFFFFFF') {
+    tx.addInput = function(txid, vout, sequence = 'FFFFFFFF', redeemScript) {
       const input = { txid, vout, scriptSig: '', sequence };
       input.sign = function(utxo, privateKey) {
         const scriptName = validateUnlockingKey(utxo.scriptPubKey, privateKey)
@@ -69,8 +69,11 @@ const btcTx = (function() {
           tx.witness.push(signature);
           tx.witness.push(publicKey);
 
+        } else if (scriptName === 'P2SH')  { // Pay to script hash
+          const signature = signTx(tx, inputInd, utxo.scriptPubKey, privateKey);
+          input.scriptSig = unlockP2SHScript(signature, redeemScript);          
+
         } else if (scriptName === 'P2MS')  { console.error(`${scriptName} Not suported`); // TODO: Pay to multisig
-        } else if (scriptName === 'P2SH')  { console.error(`${scriptName} Not suported`); // TODO: Pay to script hash
         } else if (scriptName === 'P2WSH') { console.error(`${scriptName} Not suported`); // TODO: Pay to witness script hash
 
         } else { console.error(`Unknown script in the utxo`, utxo); }        
@@ -427,6 +430,21 @@ const btcTx = (function() {
     const sigSize = Math.ceil(signature.length / 2);
     let scriptSig = opCodeToHex('OP_PUSHBYTES_' + sigSize);
     scriptSig += signature.padStart(sigSize * 2, '0');
+    return scriptSig;
+  }
+
+  // Generates the unlocking script for P2SH, to be added into a input.scriptSig
+  function unlockP2SHScript(signature, redeemScript) {
+    // OP_PUSHBYTES_72 <signature> 
+    // OP_PUSHBYTES_42	2a
+    // <Redeem Script>	04f0601a67b1752103c706f2b4d7d7b8d549f66e5007add96c32171adb3f62a8d9de55b7f24997fdf6ac
+    const sigSize = Math.ceil(signature.length / 2);
+    let scriptSig = opCodeToHex('OP_PUSHBYTES_' + sigSize);
+    scriptSig += signature.padStart(sigSize * 2, '0');
+
+    const scriptSize = Math.ceil(redeemScript.length / 2);
+    scriptSig += opCodeToHex('OP_PUSHBYTES_' + scriptSize);
+    scriptSig += redeemScript.padStart(scriptSize * 2, '0');
     return scriptSig;
   }
 

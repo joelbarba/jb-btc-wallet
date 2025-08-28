@@ -170,6 +170,20 @@ function checkUtxoPrivateKey() {
       getEl('utxo-private-key-check').style = `color: ${isValid ? 'green': 'red' }`;
       return isValid;
     }
+    if (scriptName === 'P2SH'){ 
+      const redeemScript = getEl('utxo-redeem-script-input').value;
+      const redeemHash = hashes.hash160(redeemScript);
+      const redeemHashFromUTXO = utxo.scriptPubKey.slice(4, -2); // a9 14 952d67c55f766681c2a600d777da88ac1d2e34de 87
+      const isValid = redeemHash === redeemHashFromUTXO;
+      if (!isValid) {
+        console.log(redeemHash, 'redeemHash')
+        console.log(redeemHashFromUTXO, 'redeemHashFromUTXO');
+      }
+      checkTxt = (isValid ? `✔ (valid)` : `x (invalid)`) + ` - redeemScriptHash = ${redeemHashFromUTXO}`;
+      getEl('utxo-private-key-check').innerHTML = checkTxt;
+      getEl('utxo-private-key-check').style = `color: ${isValid ? 'green': 'red' }`;
+      return isValid;
+    } 
   }
   return false;
 }
@@ -224,10 +238,13 @@ getEl('tx-create-transaction').addEventListener('click', () => {
 
   // Generate the input (unlock/sign the UTXO)
   const utxoScriptName = btcTx.guessLockScript(utxo.scriptPubKey);
-  if (['P2PK', 'P2PKH', 'P2WPKH'].indexOf(utxoScriptName) < 0) {
+  if (['P2PK', 'P2PKH', 'P2WPKH', 'P2SH'].indexOf(utxoScriptName) < 0) {
     textarea.value = `${utxoScriptName}: signature (unlock) still not implemented...`; return;
   }
-  const input = newTx.addInput(utxo.txid, utxo.vout).sign(utxo, utxo.privateKey);
+  const redeemScript = getEl('utxo-redeem-script-input').value;
+  let sequence = 'FFFFFFFF';
+  if (utxoScriptName === 'P2SH') { sequence = 'FFFFFFFD'; newTx.locktime = format('671b5000', 'hex', 'dec'); }
+  const input = newTx.addInput(utxo.txid, utxo.vout, sequence, redeemScript).sign(utxo, utxo.privateKey);
 
   textarea.value = newTx.getRawTx();
   console.log('New TX:', newTx);

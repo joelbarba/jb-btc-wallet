@@ -1,6 +1,6 @@
 # JB-BTC-WALLET
 
-This is a Vanilla Bitcoin Wallet generator. It makes all calculations with 0 dependencies from any external library.
+This is a Vanilla Bitcoin Wallet generator. It makes all calculations with **0 dependencies** from any external library.
 
 This is obviously not meant for production usage! but for learning purposes only.
 
@@ -8,6 +8,8 @@ The fact that no external libraries or native APIs have been used is to have a f
 
 You can find a running instance here: [https://jb-btc-wallet.netlify.app/](https://jb-btc-wallet.netlify.app/)
 Even though values are exactly the same as if you'd use a comercial wallet, do not use any of these wallets with real bitcoins. Always protect your data.
+
+![Screenshot of the site](./sample1.png)
 
 ## JS Modules
 
@@ -31,17 +33,17 @@ There are however other formats we need, so a "format" function is provided in t
 
 Here's the different formats a value can be transformed from/to:
 
-  - bin = binary (string of 0s 1s)
-  - dec = decimal (BigInt)
-  - hex = hexadecimal (string 'FF' = 1byte)
-  - b58 = base58
-  - b32 = bech32
-  - str = plain text string
-  - rev = hex with byte order reversed
-  - lie = little-endian (hex with byte order reversed pad to 4 bytes)
-  - com = compact-size (dynamic 1, 3, 5 or 9 bytes value encoding)
-  - sig = ecdsa signature (Array of 2 BigInts [r, s])
-  - der = DER Encoding (Distinguished Encoding Rules) of a signature (in hex)  
+  - `bin` = binary (string of 0s 1s)
+  - `dec` = decimal (BigInt)
+  - `hex` = hexadecimal (string 'FF' = 1byte)
+  - `b58` = base58
+  - `b32` = bech32
+  - `str` = plain text string
+  - `rev` = hex with byte order reversed
+  - `lie` = little-endian (hex with byte order reversed pad to 4 bytes)
+  - `com` = compact-size (dynamic 1, 3, 5 or 9 bytes value encoding)
+  - `sig` = ecdsa signature (Array of 2 BigInts [r, s])
+  - `der` = DER Encoding (Distinguished Encoding Rules) of a signature (in hex)  
 
 The module exports the `format(value, formatIn, formatOut)` function, which takes 3 parameters: the value to convert from, the format from and the format to.
 
@@ -62,14 +64,14 @@ All input/output parameters are in hexadecimal strings, except base58Check retur
 There is a function for each of the following operations:
 
 ```
-  - sha256       --> (hex) => hex
-  - sha512       --> (hex) => hex
-  - ripemd160    --> (hex) => hex
-  - hash256      --> (hex) => hex
-  - hash160      --> (hex) => hex
-  - base58Check  --> (hex) => b58
-  - hmac512      --> (key hex, msg hex) => hex
-  - pbkdf2       --> (password hex, salt hex, iterations, dkLen) => hex
+- sha256       --> (hex) => hex
+- sha512       --> (hex) => hex
+- ripemd160    --> (hex) => hex
+- hash256      --> (hex) => hex
+- hash160      --> (hex) => hex
+- base58Check  --> (hex) => b58
+- hmac512      --> (key hex, msg hex) => hex
+- pbkdf2       --> (password hex, salt hex, iterations, dkLen) => hex
 ```
 
 Example:
@@ -88,13 +90,13 @@ This module contains the main constants and methods to use ECDSA (Elliptic Curve
 It exports an object to access the constant values of the Bitcoin Elliptic Curve: `ecdsa.secp256k1`. And the main functions to perform operations on the curve:
 
 ```
-  - mod       --> (value) => value                 Modulus operation on secp256k1.p
-  - inverse   --> (value) => value                 Inverse operation K^-1
-  - double    --> ([x, y]) => [x, y]               Dobules the coordinates of the given point
-  - add       --> ([x1, y1], [x2, y2]) => [x, y]   Adds 2 points
-  - mult      --> ([x, y], mul) => [x, y]          Multiplies a point by a value
-  - modPow    --> (value, exp, mod) => value       Modular power operation
-  - modSqrt   --> (value) => value                 Modular Square Root operation
+- mod       --> (value) => value                 Modulus operation on secp256k1.p
+- inverse   --> (value) => value                 Inverse operation K^-1
+- double    --> ([x, y]) => [x, y]               Dobules the coordinates of the given point
+- add       --> ([x1, y1], [x2, y2]) => [x, y]   Adds 2 points
+- mult      --> ([x, y], mul) => [x, y]          Multiplies a point by a value
+- modPow    --> (value, exp, mod) => value       Modular power operation
+- modSqrt   --> (value) => value                 Modular Square Root operation
 ```
 
 Example:
